@@ -31,6 +31,8 @@ class RegionProcedureNodeBase : public ProcedureNode
      * Region Data
      */
     private:
+    // Box from target Configuration
+    const Box *box_;
     // 3D map of available voxels
     Array3D<std::pair<Vec3<int>, bool>> voxelMap_;
     // Number of voxels along each cell axis
@@ -39,10 +41,6 @@ class RegionProcedureNodeBase : public ProcedureNode
     Vec3<double> voxelSizeFrac_;
     // Lower-left corner voxel indices of free regions
     std::vector<std::pair<Vec3<int>, bool>> freeVoxels_;
-
-    protected:
-    // Box of target Configuration
-    const Box *box_;
 
     protected:
     // Return whether voxel centred at supplied real coordinates is valid

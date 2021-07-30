@@ -8,7 +8,7 @@
 constexpr double voxelSize = 2.0;
 
 RegionProcedureNodeBase::RegionProcedureNodeBase(ProcedureNode::NodeType nodeType)
-    : ProcedureNode(nodeType, ProcedureNode::NodeClass::Region), box_(nullptr)
+    : ProcedureNode(nodeType, ProcedureNode::NodeClass::Region)
 {
 }
 
@@ -56,12 +56,11 @@ bool RegionProcedureNodeBase::validCoordinate(Vec3<double> r) const
 bool RegionProcedureNodeBase::execute(ProcessPool &procPool, Configuration *cfg, std::string_view prefix,
                                       GenericList &targetList)
 {
-    // Copy Box pointer from Configuration
     box_ = cfg->box();
 
     // Determine number of divisions along each cell axis, and set fractional voxel size
     for (auto n = 0; n < 3; ++n)
-        nVoxels_.set(n, cfg->box()->axisLength(n) / voxelSize);
+        nVoxels_.set(n, box_->axisLength(n) / voxelSize);
     voxelSizeFrac_.set(1.0 / nVoxels_.x, 1.0 / nVoxels_.y, 1.0 / nVoxels_.z);
 
     // Initialise 3D map and determine valid voxels
@@ -74,7 +73,7 @@ bool RegionProcedureNodeBase::execute(ProcessPool &procPool, Configuration *cfg,
                     isVoxelValid(cfg, box_->getReal(Vec3<double>((x + 0.5) * voxelSizeFrac_.x, (y + 0.5) * voxelSizeFrac_.y,
                                                                  (z + 0.5) * voxelSizeFrac_.z)))};
 
-    // Create linear array of all available voxels
+    // Create linear vector of all available voxels
     auto nFreeVoxels = std::count_if(voxelMap_.begin(), voxelMap_.end(), [](const auto &voxel) { return voxel.second; });
     freeVoxels_.clear();
     freeVoxels_.resize(nFreeVoxels);
