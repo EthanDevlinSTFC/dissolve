@@ -94,6 +94,10 @@ bool AddProcedureNode::prepare(Configuration *cfg, std::string_view prefix, Gene
     if (!keywords_.asBool("ScaleA") && !keywords_.asBool("ScaleB") && !keywords_.asBool("ScaleC"))
         return Messenger::error("Must have at least one scalable box axis!\n");
 
+    // Prepare region branch
+    if (regionBranch_)
+        regionBranch_->prepare(cfg, prefix, targetList);
+
     return true;
 }
 
@@ -221,6 +225,14 @@ bool AddProcedureNode::execute(ProcessPool &procPool, Configuration *cfg, std::s
 
     Messenger::print("[Add] Positioning type is '{}' and rotation is {}.\n",
                      AddProcedureNode::positioningTypes().keyword(positioning), rotate ? "on" : "off");
+    if (positioning == AddProcedureNode::PositioningType::Region)
+    {
+        if (regionNode && !regionNode->update(cfg))
+            return false;
+        else
+            return Messenger::error("Positioning type set to '{}' but no region was given.\n",
+                                    AddProcedureNode::positioningTypes().keyword(positioning));
+    }
 
     // Now we add the molecules
     procPool.initialiseRandomBuffer(ProcessPool::PoolProcessesCommunicator);
