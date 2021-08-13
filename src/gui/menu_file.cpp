@@ -71,6 +71,7 @@ void DissolveWindow::on_FileNewAction_triggered(bool checked)
     if (!checkSaveCurrentInput())
         return;
 
+    createRecentMenu();
     startNew();
 }
 

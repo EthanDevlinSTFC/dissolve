@@ -228,6 +228,35 @@ bool DissolveWindow::openLocalFile(std::string_view inputFile, std::string_view 
 }
 
 /*
+ * Open Recent Functions
+ */
+
+void DissolveWindow::openRecent()
+{
+    std::string filePath = "";
+    QAction *action = qobject_cast<QAction *>(sender());
+    if (action)
+        filePath = action->data().toString().toUtf8().constData();
+        openLocalFile(filePath,"",false,false);
+}
+
+void DissolveWindow::createRecentMenu()
+{
+    int recentLength = 4;
+    QAction* recentFileAction = 0;
+    for(auto i=0; i<recentLength; i++)
+    {
+        recentFileAction = new QAction(this);
+        recentFileAction->setVisible(false);
+        recentFileAction->setText("testMenu");
+        recentFileAction->setVisible(true);
+        QObject::connect(recentFileAction, SIGNAL(triggered(bool)), this, SLOT(openRecent()));
+        ui_.FileOpenRecentMenu->addAction(recentFileAction);
+        recentFileActionList.append(recentFileAction);
+    }
+}
+
+/*
  * Update Functions
  */
 
