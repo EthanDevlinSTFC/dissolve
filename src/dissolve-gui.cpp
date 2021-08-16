@@ -58,7 +58,7 @@ int main(int args, char **argv)
                      Version::info());
     Messenger::print("Source repository: {}.\n", Version::repoUrl());
     Messenger::print("Dissolve comes with ABSOLUTELY NO WARRANTY.\n");
-    Messenger::print("This is test7 software, and you are welcome to redistribute it under certain conditions.\n");
+    Messenger::print("This is test software, and you are welcome to redistribute it under certain conditions.\n");
     Messenger::print("For more details read the GPL at <http://www.gnu.org/copyleft/gpl.html>.\n");
 
     // If an input file was specified, load it here
@@ -90,7 +90,8 @@ int main(int args, char **argv)
             }
         }
     }
-
+    // Create recent files menu
+    dissolveWindow.createRecentMenu();
     // Update the main window and exec the app
     dissolveWindow.fullUpdate();
 
