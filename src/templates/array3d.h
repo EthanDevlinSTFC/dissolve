@@ -7,6 +7,7 @@
 #include "templates/list.h"
 #include "templates/vector3.h"
 #include <numeric>
+#include <tuple>
 #include <vector>
 
 // Array3D
@@ -112,6 +113,28 @@ template <class A> class Array3D
         assert(z >= 0 && z < nZ_);
 
         return &array_[sliceOffsets_[z] + y * nX_ + x];
+    }
+    // Return iterable vector of array index's
+    std::vector<std::tuple<double, double, double>> indices() const
+    {
+        std::vector<std::tuple<double, double, double>> indexes;
+        double x, y, z = 0;
+        for (auto i = 0; i < nX_ * nY_ * nZ_; i++)
+        {
+            indexes.push_back(std::make_tuple(x, y, z));
+            z++;
+            if (z == nZ_)
+            {
+                y++;
+                z = 0;
+            }
+            if (y == nY_)
+            {
+                x++;
+                y = 0;
+            }
+        }
+        return indexes;
     }
     // Return array size in x
     int nX() const { return nX_; }
