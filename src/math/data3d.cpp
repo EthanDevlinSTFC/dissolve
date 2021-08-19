@@ -348,6 +348,8 @@ bool Data3D::deserialise(LineParser &parser)
     {
         for (auto &[x, y, z] : values_.indices())
         {
+            if (parser.getArgsDelim(LineParser::Defaults) != LineParser::Success)
+                return false;
             values_[{x, y, z}] = parser.argd(0);
             errors_[{x, y, z}] = parser.argd(1);
         }
