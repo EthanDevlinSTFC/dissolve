@@ -193,7 +193,7 @@ template <class A> class Array2D
     {
         std::vector<std::tuple<double, double>> indexes;
         double x, y = 0;
-        for (auto i = 0; i < nRows_ * nColumns_ ; i++)
+        for (auto i = 0; i < nRows_ * nColumns_; i++)
         {
             indexes.push_back(std::make_tuple(x, y));
             y++;
