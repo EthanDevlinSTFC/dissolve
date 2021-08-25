@@ -42,9 +42,6 @@ int main(int args, char **argv)
     // Set native siblings attribute to prevent odd rendering artefacts on some systems
     app.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
-    // Set high DPI pixmaps
-    app.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
-
     // Ensure that the C locale is set, otherwise printf() and friends may not use dot for the radix point
     setlocale(LC_NUMERIC, "C");
     QLocale::setDefault(QLocale::C);
@@ -52,6 +49,9 @@ int main(int args, char **argv)
     // Create the main window
     DissolveWindow dissolveWindow(dissolve);
     dissolveWindow.show();
+
+    // Create recent files menu
+    dissolveWindow.createRecentMenu();
 
     // Print GPL license information
     Messenger::print("Dissolve-GUI {} version {}, Copyright (C) 2021 Team Dissolve and contributors.\n", Version::appType(),
@@ -90,8 +90,6 @@ int main(int args, char **argv)
             }
         }
     }
-    // Create recent files menu
-    dissolveWindow.createRecentMenu();
     // Update the main window and exec the app
     dissolveWindow.fullUpdate();
 

@@ -346,18 +346,12 @@ bool Data3D::deserialise(LineParser &parser)
     // Read errors / valuse
     if (hasError_)
     {
-        for (auto x = 0; x < x_.size(); ++x)
+        for (auto &[x, y, z] : values_.indices())
         {
-            for (auto y = 0; y < y_.size(); ++y)
-            {
-                for (auto z = 0; z < z_.size(); ++z)
-                {
-                    if (parser.getArgsDelim(LineParser::Defaults) != LineParser::Success)
-                        return false;
-                    values_[{x, y, z}] = parser.argd(0);
-                    errors_[{x, y, z}] = parser.argd(1);
-                }
-            }
+            if (parser.getArgsDelim(LineParser::Defaults) != LineParser::Success)
+                return false;
+            values_[{x, y, z}] = parser.argd(0);
+            errors_[{x, y, z}] = parser.argd(1);
         }
     }
     else
@@ -402,16 +396,10 @@ bool Data3D::serialise(LineParser &parser) const
     // Write values / errors
     if (hasError_)
     {
-        for (auto x = 0; x < x_.size(); ++x)
+        for (auto &[x, y, z] : values_.indices())
         {
-            for (auto y = 0; y < y_.size(); ++y)
-            {
-                for (auto z = 0; z < z_.size(); ++z)
-                    // TODO: Turn into a single loop when we have an
-                    // iterator combinator
-                    if (!parser.writeLineF("{:e}  {:e}\n", values_[{x, y, z}], errors_[{x, y, z}]))
-                        return false;
-            }
+            if (!parser.writeLineF("{:e}  {:e}\n", values_[{x, y, z}], errors_[{x, y, z}]))
+                return false;
         }
     }
     else

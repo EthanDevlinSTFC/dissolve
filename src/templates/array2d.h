@@ -187,6 +187,25 @@ template <class A> class Array2D
         else
             return &array_[rowOffsets_[row] + column];
     }
+
+    // Return iterable vector of array index's
+    std::vector<std::tuple<double, double>> indices() const
+    {
+        std::vector<std::tuple<double, double>> indexes;
+        double x, y = 0;
+        for (auto i = 0; i < nRows_ * nColumns_; i++)
+        {
+            indexes.push_back(std::make_tuple(x, y));
+            y++;
+            if (y == nColumns_)
+            {
+                x++;
+                y = 0;
+            }
+        }
+        return indexes;
+    }
+
     // Return whether the array is halved
     bool halved() const { return half_; }
     // Return number of rows

@@ -22,7 +22,7 @@
 #include <QSettings>
 
 DissolveWindow::DissolveWindow(Dissolve &dissolve)
-    : QMainWindow(nullptr), dissolve_(dissolve), threadController_(this, dissolve), recentFileNo(4)
+    : QMainWindow(nullptr), dissolve_(dissolve), threadController_(this, dissolve), recentFileNo_(10)
 {
     // Initialise resources
     Q_INIT_RESOURCE(main);
@@ -217,7 +217,9 @@ bool DissolveWindow::openLocalFile(std::string_view inputFile, std::string_view 
 
     dissolveState_ = EditingState;
     // Add file to recent menu
-    adjustForCurrentFile(QString::fromStdString(std::string(inputFile)));
+    QString filePath = inputFileInfo.absoluteDir().absolutePath();
+    std::string fileName = dissolve_.inputFilename().data();
+    addRecentFile(filePath + QString::fromStdString("/"+fileName));
     // Fully update GUI
     fullUpdate();
 
@@ -227,18 +229,15 @@ bool DissolveWindow::openLocalFile(std::string_view inputFile, std::string_view 
 /*
  * Open Recent Functions
  */
-void DissolveWindow::adjustForCurrentFile(const QString &filePath)
+void DissolveWindow::addRecentFile(const QString &filePath)
 {
     // Add new entry to recent files
     QSettings settings;
     QStringList recentFilePaths = settings.value("recentFiles").toStringList();
     recentFilePaths.removeAll(filePath);
     recentFilePaths.prepend(filePath);
-    while (recentFilePaths.size() > recentFileNo)
-    {
-        recentFilePaths.removeLast();
-        settings.setValue("recentFiles", recentFilePaths);
-    }
+    if (recentFilePaths.size() > recentFileNo_)
+        recentFilePaths.erase(recentFilePaths.begin() + recentFileNo_, recentFilePaths.end());
     settings.setValue("recentFiles", recentFilePaths);
     updateRecentActionList();
 }
@@ -259,15 +258,19 @@ void DissolveWindow::openRecent()
 
 void DissolveWindow::createRecentMenu()
 {
-    int recentLength = recentFileNo;
+    int recentLength = recentFileNo_;
     QAction *recentFileAction = 0;
+
+    QFont font = ui_.SessionMenu->font();
+    ui_.FileOpenRecentMenu->setFont(font);
+
     for (auto i = 0; i < recentLength; i++)
     {
         recentFileAction = new QAction(this);
         recentFileAction->setVisible(false);
         QObject::connect(recentFileAction, SIGNAL(triggered(bool)), this, SLOT(openRecent()));
         ui_.FileOpenRecentMenu->addAction(recentFileAction);
-        recentFileActionList.append(recentFileAction);
+        recentFileActionList_.append(recentFileAction);
     }
     updateRecentActionList();
 }
@@ -277,26 +280,19 @@ void DissolveWindow::updateRecentActionList()
     QSettings settings;
     QStringList recentFilePaths = settings.value("recentFiles").toStringList();
 
-    auto itEnd = 0u;
-    if (recentFilePaths.size() <= recentFileNo)
-    {
-        itEnd = recentFilePaths.size();
-    }
-    else
-    {
-        itEnd = recentFileNo;
-    }
     // Fill recent menu
-    for (auto i = 0u; i < itEnd; ++i)
+    for (auto i = 0u; i < recentFileNo_; ++i)
     {
-        QString strippedName = QFileInfo(recentFilePaths.at(i)).fileName();
-        recentFileActionList.at(i)->setText(strippedName);
-        recentFileActionList.at(i)->setData(recentFilePaths.at(i));
-        recentFileActionList.at(i)->setVisible(true);
+        if (i < recentFilePaths.size())
+        {
+            QString strippedName = QFileInfo(recentFilePaths.at(i)).fileName();
+            recentFileActionList_.at(i)->setText(strippedName+"    "+recentFilePaths.at(i));
+            recentFileActionList_.at(i)->setData(recentFilePaths.at(i));
+            recentFileActionList_.at(i)->setVisible(true);
+        }
+        else
+            recentFileActionList_.at(i)->setVisible(false);
     }
-
-    for (auto i = itEnd; i < recentFileNo; ++i)
-        recentFileActionList.at(i)->setVisible(false);
 }
 
 /*
