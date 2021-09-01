@@ -18,17 +18,40 @@ template <class A> class ArrayIndex
         nX = inArray.nX();
         nY = inArray.nY();
         nZ = inArray.nZ();
-        arrayIndex = {0,0,0};
-        std::vector<A> 
+        ptr* = &inArray[{0,0,0}];
     }
-    ArrayIndex(Array2D& inArray)
+
+    Arrayindex& operator++()
     {
-        nX=inArray.nRows();
-        nY=inArray.nColumns();
-        nZ=0;
+        ++ptr;
+        return *this;
+    }
+    Arrayindex& operator--()
+    {
+        --ptr;
+        return *this;
+    }
+    std::tuple<int,int,int> operator*()
+    {
+        int rawIndex = ptr - &inArray[{0,0}];
+        int x = rawIndex/(nY*nZ);
+        int y = rawIndex%nY/nZ;
+        int z = rawIndex%nY%nZ;
+        std::tuple<int,int,int> arrayIndex = std::make_tuple(x,y,z);
+        return arrayIndex;
+    }
+    
+    std::tuple<int,int,int> begin()
+    {
+        return std::make_tuple(0,0,0);
+    }
+
+    std::tuple<int,int,int> end()
+    {
+        return std::make_tuple(nX,nY,nZ);
     }
 
     private:
         int nX;nY;nZ;
-        std::tuple<int,int,int> arrayIndex;
+        int ptr*;
 }
